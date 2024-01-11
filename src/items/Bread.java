@@ -1,8 +1,8 @@
 package items;
 
-public class Pen extends Item{
+public class Bread extends Item{
 
-  public Pen() {
+  public Bread() {
     super.name = "Ball Point Pen";
     super.value = 1000;
   }

@@ -2,7 +2,7 @@ import customer.Card;
 import customer.Cart;
 import customer.Customer;
 import items.Coffee;
-import items.Pen;
+import items.Bread;
 import java.util.Scanner;
 
 public class Main {
@@ -60,7 +60,7 @@ public class Main {
       }
       // 볼펜 선택
       else if (itemCode == 2) {
-        customer.getCart().insertCart("Ball Point Pen",new Pen());
+        customer.getCart().insertCart("Ball Point Pen",new Bread());
       }
       // 장바구니 확인
       else if (itemCode == 0) {
@@ -126,4 +126,9 @@ public class Main {
 1. 마트 계산 시스템을 구성하는 메세지는 무엇일까?
 2. 마트 계산 시스템에는 어떤 객체가 필요하고, 각 객체는 어떤 책임을 가져야할까?(Hint. 고객, 상품, 카트, 마트오너 + etc)
 3. 어떻게 협력해야할까?
+
+추가 요구사항
+- 유통기한 1일전 70% 할인
+- 02~05시 특별 30% 할인
+- 다수의 할인 정책을 지원하는 상품의 경우 최대 할인율을 제공하는 할인 정책으로 결정
  */

@@ -14,7 +14,7 @@ public class Mart {
 
     for(int i = 0; i < names.length; i++){
       List<Item> itemList = items.get(names[i]);
-      payValue += (itemList.get(0).getValue() * itemList.size());
+      payValue += (itemList.get(0).calcSale() * itemList.size());
     }
     return payValue;
 

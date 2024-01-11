@@ -6,6 +6,8 @@ public interface Payment {
 
   public int pay(int payValue);
 
+  public void charge(int chargeValue);
+
   public int getMoney();
 
 

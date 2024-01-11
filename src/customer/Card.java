@@ -14,7 +14,13 @@ public class Card implements Payment {
     }
       System.out.println("결제가 완료되었습니다");
       return (this.money - payValue);
-    }
+  }
+
+  @Override
+  public void charge(int chargeValue) {
+    this.money += chargeValue;
+    System.out.println(chargeValue + "원 충전 완료되었습니다. 잔액은 " + this.money + "원 입니다");
+  }
 
   public int getMoney() {
     return money;

@@ -16,6 +16,7 @@ public class Main {
       System.out.println("결제 수단을 선택해주세요");
       System.out.println("1: 카드");
       System.out.println("0: 나가기");
+
       int paymentCode = 0;
       try{
         paymentCode = scanner.nextInt();
@@ -45,7 +46,7 @@ public class Main {
       System.out.println("-2: 나가기");
       System.out.println("-3: 카드 충전하기");
       System.out.println("1: 아메리카노");
-      System.out.println("2: 볼펜");
+      System.out.println("2: 빵");
 
       int itemCode = 0;
       try {
@@ -60,7 +61,7 @@ public class Main {
       }
       // 볼펜 선택
       else if (itemCode == 2) {
-        customer.getCart().insertCart("Ball Point Pen",new Bread());
+        customer.getCart().insertCart("Bread",new Bread());
       }
       // 장바구니 확인
       else if (itemCode == 0) {

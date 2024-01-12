@@ -10,10 +10,14 @@ public class Card implements Payment {
   public int pay(int payValue){
     if(this.money < payValue){
       System.out.println("잔액이 부족합니다");
-      return this.money;
+      System.out.println("잔액은 " + this.money + "원 입니다\n충전해주세요");
+      return 2;
     }
-      System.out.println("결제가 완료되었습니다");
-      return (this.money - payValue);
+    this.money -= payValue;
+    System.out.println("결제가 완료되었습니다");
+    System.out.println("잔액은 " + this.money + "원 입니다");
+
+    return 1;
   }
 
   @Override

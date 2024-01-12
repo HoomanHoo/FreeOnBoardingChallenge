@@ -1,16 +1,18 @@
-import customer.Card;
 import customer.Cart;
 import customer.Customer;
-import items.Coffee;
-import items.Bread;
+import factorys.ItemFactory;
+import factorys.PaymentFactory;
 import java.util.Scanner;
 
 public class Main {
 
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
-    Customer customer = new Customer(new Cart());
+    Customer customer;
     Mart mart = new Mart();
+    // Payment와 Item 타입 객체에 대한 의존도를 낮추기 위해 Factory 클래스 생성
+    PaymentFactory paymentFactory = new PaymentFactory();
+    ItemFactory itemFactory = new ItemFactory();
 
     while (true){
       System.out.println("결제 수단을 선택해주세요");
@@ -26,93 +28,135 @@ public class Main {
         continue;
       }
       if(paymentCode == 1){
-        customer.setPayment(new Card());
+        customer = new Customer(new Cart(),paymentFactory.createPayment(paymentCode));
         System.out.println("카드를 결제 수단으로 선택하였습니다\n");
         System.out.println("현재 잔액은 " + customer.getPayment().getMoney() + "원 입니다");
         break;
       }
-      else if(paymentCode == 0){
+      if(paymentCode == 0){
         System.out.println("방문해주셔서 감사합니다");
         return;
+      }
+      if(paymentCode != 0 && paymentCode != 1){
+        System.out.println("유효하지 않은 입력입니다. 다시 입력해주세요");
       }
     }
 
 
     
     while(true) {
-      System.out.println("장바구니에 담을 물건을 선택해주세요");
+      System.out.println("행동을 선택해주세요");
       System.out.println("0: 장바구니 목록 확인");
       System.out.println("-1: 결제하기");
       System.out.println("-2: 나가기");
       System.out.println("-3: 카드 충전하기");
-      System.out.println("1: 아메리카노");
-      System.out.println("2: 빵");
+      System.out.println("-4: 장바구니 비우기");
+      System.out.println("1: 아메리카노 장바구니에 담기");
+      System.out.println("2: 빵 장바구니에 담기");
 
       int itemCode = 0;
+      String itemName;
       try {
         itemCode = scanner.nextInt();
       } catch (Exception e){
         System.out.println(e);
         continue;
       }
-      // 아메리카노 선택
-      if(itemCode == 1){
-        customer.getCart().insertCart("Americano", new Coffee());
+      switch (itemCode) {
+        case 1 -> {
+        itemName = "Americano";
+        customer.getCart().insertCart(itemName, itemFactory.createItem(itemName));
+        continue;
       }
-      // 볼펜 선택
-      else if (itemCode == 2) {
-        customer.getCart().insertCart("Bread",new Bread());
-      }
-      // 장바구니 확인
-      else if (itemCode == 0) {
-        System.out.println(customer.getCart().toString());
-      }
-      // 결제하기
-      else if (itemCode == -1) {
-
-        int paymentValue = mart.calc(customer.getCart());
-        
-        System.out.println("총 결제 금액은 " + paymentValue + "원 입니다\n결제 하시겠습니까?");
-        while(true){
-          System.out.println("1: 결제");
-          System.out.println("2: 취소");
-          int payCode = 0;
-          try {
-            payCode = scanner.nextInt();
-          } catch (Exception e){
-            System.out.println(e);
+        case 2 -> {
+          itemName = "Bread";
+          customer.getCart().insertCart(itemName,itemFactory.createItem(itemName));
+          continue;
+        }
+        case 0 -> {
+          System.out.println(customer.getCart().toString());
+          continue;
+        }
+        case -1 -> {
+          int paymentValue = mart.calc(customer.getCart());
+          System.out.println("총 결제 금액은 " + paymentValue + "원 입니다\n결제 하시겠습니까?");
+          int payCode = paying(scanner, customer, paymentValue);
+          // payCode = 1 -> 결제, 2 -> 결제 취소, 3 -> 잔액 부족
+          if(payCode != 1){
             continue;
           }
-          if(payCode == 1){
-            int balance = customer.getPayment().pay(paymentValue);
-            if(balance >= 0) {
-              System.out.println("잔액은 " + balance + "원 입니다");
-              break;
-            }
-            else {
-              System.out.println("잔액은 " + balance + "원 입니다\n충전해주세요");
-              break;
-            }
-          }
+          customer.clearCart();
+        }
+        case -2 -> {
+          System.out.println("방문해주셔서 감사합니다");
+          return;
+        }
+        case -3 -> {
+          System.out.println("충전 기능은 준비중입니다");
+          continue;
+        }
+        case -4 -> {
+          customer.clearCart();
+          continue;
+        }
+        default -> {
+          System.out.println("입력 오류");
+          continue;
         }
 
+      }
+      // 다시 물건 구매하기로 돌아갈지 선택
+      int replay = 0;
+      while(true){
+        System.out.println("다시 쇼핑 하시겠습니까?\n1: 네\n2: 아니오");
+        replay = scanner.nextInt();
+        if(replay != 1 && replay != 2){
+          System.out.println("입력 오류");
+          continue;
+        }
         break;
       }
-      // 카드 충전하기
-      else if(itemCode == -3){
-        break;
+      // 다시 물건 구매로 돌아가기
+      if(replay == 1){
+        continue;
       }
-
-      // 나가기
-      else if (itemCode == -2) {
+      // 종료하기
+      if(replay == 2){
         System.out.println("방문해주셔서 감사합니다");
         return;
       }
-      // 입력 오류
-      else {
-        System.out.println("정확한 상품 코드를 입력해주세요");
+    }
+  }
+
+  private static int paying(Scanner scanner, Customer customer, int paymentValue) {
+    int payCode = 0;
+    while(true){
+      System.out.println("1: 결제");
+      System.out.println("2: 취소");
+      try {
+        payCode = scanner.nextInt();
+      } catch (Exception e){
+        System.out.println(e);
+        continue;
+      }
+      // 결제 선택
+      if(payCode == 1){
+        int resultCode = customer.getPayment().pay(paymentValue);
+        if(resultCode == 1) {
+          break;
+        }
+        else {
+          payCode = 3;
+          break;
+        }
+      }
+      // 결제 취소
+      if(payCode == 2){
+        System.out.println("뒤로 돌아갑니다");
+        break;
       }
     }
+      return payCode;
   }
 }
 /*
